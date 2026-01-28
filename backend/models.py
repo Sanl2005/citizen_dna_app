@@ -60,6 +60,8 @@ class Scheme(Base):
     min_age = Column(Integer, nullable=True)
     max_income = Column(Float, nullable=True)
     required_gender = Column(String(50), nullable=True)
+    apply_url = Column(String(500), nullable=True)
+    category = Column(String(100), nullable=True)
 
 
 class Recommendation(Base):

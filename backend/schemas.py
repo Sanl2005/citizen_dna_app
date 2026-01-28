@@ -29,6 +29,9 @@ class SchemeBase(BaseModel):
     eligibility_rules: str
     min_age: Optional[int] = None
     max_income: Optional[float] = None
+    required_gender: Optional[str] = None
+    apply_url: Optional[str] = None
+    category: Optional[str] = None
 
 class SchemeCreate(SchemeBase):
     pass
