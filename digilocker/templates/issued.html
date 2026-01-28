@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DigiLocker – Issued Documents</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='digilocker.css') }}">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">
+    <span class="logo-icon">🔒</span>
+    <span class="logo-text">DigiLocker</span>
+  </div>
+  <div class="top-actions">
+    <span>A+</span>
+    <span>A</span>
+    <span>A-</span>
+    <span class="lang">English</span>
+    <span class="avatar">👤</span>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="menu-item active">🏠 Home</div>
+    <div class="menu-item">🎓 Issued Documents</div>
+    <div class="menu-item">🔍 Search Documents</div>
+    <div class="menu-item">💾 Drive</div>
+    <div class="menu-item">🧰 DigiLocker Services</div>
+    <div class="menu-item">ℹ️ About DigiLocker</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <h2>You have {{ documents|length }} Issued Documents</h2>
+    <p class="subtitle">
+      DigiLocker 'Issued Documents' are at par with original documents as per IT Act, 2000
+    </p>
+
+    <form method="POST">
+      {% for doc in documents %}
+      <div class="doc-card">
+        <div class="doc-left">
+          <input type="checkbox" name="selected_docs" value="{{ doc.uri }}">
+        </div>
+
+        <div class="doc-middle">
+          <h3>{{ doc.name }}</h3>
+          <p class="doc-id">{{ doc.uri }}</p>
+          <a href="{{ doc.uri }}" target="_blank">View Document</a>
+
+        </div>
+
+        <div class="doc-right">
+          <p class="issuer">{{ doc.issuer }}</p>
+          <p class="date">Issued: Demo Date</p>
+          <span class="icon">⬇️</span>
+          <span class="icon">⋮</span>
+        </div>
+      </div>
+      {% endfor %}
+
+      <button class="continue-btn" type="submit">
+        Continue
+      </button>
+    </form>
+
+    <p class="note">Demo Mode – Mock DigiLocker Issued Documents</p>
+  </div>
+
+</div>
+
+</body>
+</html>

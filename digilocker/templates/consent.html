@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DigiLocker – Consent</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">DigiLocker</div>
+
+<div class="card">
+  <h2>Consent for Data Access</h2>
+  <p>The following documents will be shared:</p>
+
+  <ul class="doc-list">
+    {% for doc in documents %}
+      <li>
+        <strong>{{ doc.name }}</strong><br>
+        <span class="issuer">{{ doc.issuer }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form method="POST">
+    <button name="consent" value="yes">Allow</button>
+    <button name="consent" value="no" class="secondary">Deny</button>
+  </form>
+
+  <p class="note">Demo Mode – Consent simulated</p>
+</div>
+
+</body>
+</html>

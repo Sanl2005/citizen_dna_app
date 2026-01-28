@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DigiLocker – Documents</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">DigiLocker</div>
+
+<div class="card">
+  <h2>{{ name }}’s Documents</h2>
+  <p>Documents available in your DigiLocker</p>
+
+  <ul class="doc-list">
+    {% for doc in documents %}
+      <li>
+        <strong>{{ doc.name }}</strong><br>
+        <span class="issuer">{{ doc.issuer }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form method="POST">
+    <button type="submit">Continue</button>
+  </form>
+
+  <p class="note">Demo Mode – Mock DigiLocker Vault</p>
+</div>
+
+</body>
+</html>

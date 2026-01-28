@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+bcrypt==3.2.2
+passlib[bcrypt]
+sqlalchemy
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+scikit-learn
+pandas
+numpy
+python-multipart
+python-dotenv
+aiosqlite
+mysql-connector-python

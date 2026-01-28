@@ -1,0 +1,77 @@
+from typing import List, Optional
+from pydantic import BaseModel
+from datetime import datetime
+
+class UserBase(BaseModel):
+    email: str
+
+class UserCreate(UserBase):
+    full_name: str
+    password: str
+    phone: Optional[str] = None
+    role: str = "citizen" # citizen, admin
+
+class UserLogin(UserBase):
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+class SchemeBase(BaseModel):
+    scheme_name: str
+    ministry: str
+    description: str
+    benefits: str
+    eligibility_rules: str
+    min_age: Optional[int] = None
+    max_income: Optional[float] = None
+
+class SchemeCreate(SchemeBase):
+    pass
+
+class Scheme(SchemeBase):
+    id: int
+    class Config:
+        orm_mode = True
+
+class ProfileBase(BaseModel):
+    age: int
+    gender: str
+    income: float
+    education: str
+    occupation: str
+    location_state: str
+    location_district: str
+    location_type: str = "Urban"
+    community: Optional[str] = None
+    disability_status: bool
+    family_size: int
+
+class ProfileCreate(ProfileBase):
+    pass
+
+class ProfileResponse(ProfileBase):
+    id: int
+    user_id: int
+    risk_score_health: float
+    risk_score_financial: float
+    class Config:
+        orm_mode = True
+
+class RecommendationBase(BaseModel):
+    scheme_id: int
+    confidence_score: float
+    reason: str
+
+class RecommendationResponse(RecommendationBase):
+    id: int
+    scheme: Scheme
+    class Config:
+        orm_mode = True
+
+class ChatMessageRequest(BaseModel):
+    message: str

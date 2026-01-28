@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="card">
+  <h2>Welcome, {{ name }}</h2>
+  <p>DigiLocker Verification: ✅ Successful</p>
+
+  <h3>Fetched Documents</h3>
+  <ul>
+    {% for doc in documents %}
+      <li>{{ doc.name }} – {{ doc.issuer }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+</body>
+</html>
