@@ -1,0 +1,78 @@
+digraph ER {
+  graph [rankdir=LR, splines=ortho];
+  node [shape=plain];
+
+  users [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+      <tr><td bgcolor="#cfe2f3"><b>users</b></td></tr>
+      <tr><td align="left">id : INTEGER PK</td></tr>
+      <tr><td align="left">full_name : VARCHAR(255)</td></tr>
+      <tr><td align="left">email : VARCHAR(255) UNIQUE</td></tr>
+      <tr><td align="left">phone : VARCHAR(20)</td></tr>
+      <tr><td align="left">hashed_password : VARCHAR(255)</td></tr>
+      <tr><td align="left">role : VARCHAR(50) DEFAULT 'citizen'</td></tr>
+      <tr><td align="left">created_at : DATETIME</td></tr>
+    </table>
+  >];
+
+  citizen_profiles [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+      <tr><td bgcolor="#f9cb9c"><b>citizen_profiles</b></td></tr>
+      <tr><td align="left">id : INTEGER PK</td></tr>
+      <tr><td align="left">user_id : INTEGER FK -> users.id</td></tr>
+      <tr><td align="left">age : INTEGER</td></tr>
+      <tr><td align="left">gender : VARCHAR(50)</td></tr>
+      <tr><td align="left">income : FLOAT</td></tr>
+      <tr><td align="left">education : VARCHAR(100)</td></tr>
+      <tr><td align="left">occupation : VARCHAR(100)</td></tr>
+      <tr><td align="left">location_state : VARCHAR(100)</td></tr>
+      <tr><td align="left">location_district : VARCHAR(100)</td></tr>
+      <tr><td align="left">location_type : VARCHAR(50)</td></tr>
+      <tr><td align="left">area_of_residence : VARCHAR(50)</td></tr>
+      <tr><td align="left">community : VARCHAR(100) NULL</td></tr>
+      <tr><td align="left">disability_status : BOOLEAN</td></tr>
+      <tr><td align="left">family_size : INTEGER</td></tr>
+      <tr><td align="left">employment_status : VARCHAR(100)</td></tr>
+      <tr><td align="left">is_student : VARCHAR(50)</td></tr>
+      <tr><td align="left">single_parent_child : VARCHAR(50)</td></tr>
+      <tr><td align="left">marriage_cert, divorce_cert, widow_cert, community_cert, aadhar_card, income_cert, disability_cert, education_cert, bpl_cert : VARCHAR(255)</td></tr>
+      <tr><td align="left">minority_status : VARCHAR(50)</td></tr>
+      <tr><td align="left">risk_score_health, risk_score_financial : FLOAT</td></tr>
+      <tr><td align="left">digital_dna_vector : TEXT</td></tr>
+    </table>
+  >];
+
+  schemes [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+      <tr><td bgcolor="#d9ead3"><b>schemes</b></td></tr>
+      <tr><td align="left">id : INTEGER PK</td></tr>
+      <tr><td align="left">scheme_name : VARCHAR(255)</td></tr>
+      <tr><td align="left">ministry : VARCHAR(255)</td></tr>
+      <tr><td align="left">description : TEXT</td></tr>
+      <tr><td align="left">eligibility_rules : TEXT</td></tr>
+      <tr><td align="left">benefits : TEXT</td></tr>
+      <tr><td align="left">min_age, max_age : INTEGER NULL</td></tr>
+      <tr><td align="left">max_income : FLOAT NULL</td></tr>
+      <tr><td align="left">required_gender : VARCHAR(50) NULL</td></tr>
+      <tr><td align="left">apply_url : VARCHAR(500) NULL</td></tr>
+      <tr><td align="left">category : VARCHAR(255) NULL</td></tr>
+    </table>
+  >];
+
+  recommendations [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+      <tr><td bgcolor="#f4cccc"><b>recommendations</b></td></tr>
+      <tr><td align="left">id : INTEGER PK</td></tr>
+      <tr><td align="left">user_id : INTEGER FK -> users.id</td></tr>
+      <tr><td align="left">scheme_id : INTEGER FK -> schemes.id</td></tr>
+      <tr><td align="left">confidence_score : FLOAT</td></tr>
+      <tr><td align="left">reason : TEXT</td></tr>
+      <tr><td align="left">created_at : DATETIME</td></tr>
+    </table>
+  >];
+
+  /* Relationships */
+  users -> citizen_profiles [label="1 - 1", arrowhead=none];
+  users -> recommendations [label="1 - *", arrowhead=vee];
+  schemes -> recommendations [label="1 - *", arrowhead=vee];
+}

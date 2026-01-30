@@ -51,6 +51,9 @@ class CitizenProfile(Base):
     community_cert = Column(String(255), nullable=True)
     aadhar_card = Column(String(255), nullable=True)
     income_cert = Column(String(255), nullable=True)
+    disability_cert = Column(String(255), nullable=True)
+    education_cert = Column(String(255), nullable=True)
+    bpl_cert = Column(String(255), nullable=True)
 
     # Calculated risk score from AI
     minority_status = Column(String(50), default="No")
@@ -78,7 +81,7 @@ class Scheme(Base):
     max_income = Column(Float, nullable=True)
     required_gender = Column(String(50), nullable=True)
     apply_url = Column(String(500), nullable=True)
-    category = Column(String(100), nullable=True)
+    category = Column(String(255), nullable=True)
 
 
 class Recommendation(Base):

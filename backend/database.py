@@ -4,7 +4,8 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Default to SQLite for local development, can be overridden for MySQL
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./citizen_dna_v5.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///G:/citizen_dna_app/backend/citizen_dna_v7.db")
+print(f"DEBUG: Using Database URL: {DATABASE_URL}")
 
 # If using SQLite, check_same_thread is needed
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}

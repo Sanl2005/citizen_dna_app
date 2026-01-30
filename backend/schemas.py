@@ -28,6 +28,7 @@ class SchemeBase(BaseModel):
     benefits: str
     eligibility_rules: str
     min_age: Optional[int] = None
+    max_age: Optional[int] = None
     max_income: Optional[float] = None
     required_gender: Optional[str] = None
     apply_url: Optional[str] = None
@@ -39,7 +40,7 @@ class SchemeCreate(SchemeBase):
 class Scheme(SchemeBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProfileBase(BaseModel):
     age: int
@@ -63,6 +64,9 @@ class ProfileBase(BaseModel):
     community_cert: Optional[str] = None
     aadhar_card: Optional[str] = None
     income_cert: Optional[str] = None
+    disability_cert: Optional[str] = None
+    education_cert: Optional[str] = None
+    bpl_cert: Optional[str] = None
 
 class ProfileCreate(ProfileBase):
     pass
@@ -73,7 +77,7 @@ class ProfileResponse(ProfileBase):
     risk_score_health: float
     risk_score_financial: float
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RecommendationBase(BaseModel):
     scheme_id: int
@@ -84,7 +88,7 @@ class RecommendationResponse(RecommendationBase):
     id: int
     scheme: Scheme
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ChatMessageRequest(BaseModel):
     message: str

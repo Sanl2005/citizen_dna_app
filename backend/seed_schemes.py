@@ -6,14 +6,10 @@ from sqlalchemy.orm import Session
 models.Base.metadata.create_all(bind=database.engine)
 db = database.SessionLocal()
 
-def seed_schemes():
-    # Clear existing schemes to avoid duplicates
-    db.query(models.Scheme).delete()
-    
-    schemes_data = [
-        # --- FARMERS / AGRICULTURE ---
-        {
-            "scheme_name": "PM-KISAN",
+schemes_data = [
+    # --- FARMERS / AGRICULTURE ---
+    {
+        "scheme_name": "PM-KISAN",
             "ministry": "Ministry of Agriculture",
             "description": "Income support of Rs 6000 per year to all land holding farmer families.",
             "eligibility_rules": "All land holding farmers. Excludes institutional land holders and high income earners.",
@@ -341,6 +337,8 @@ def seed_schemes():
 
     ]
     
+def seed_schemes():
+    db.query(models.Scheme).delete()
     for item in schemes_data:
         scheme = models.Scheme(**item)
         db.add(scheme)
