@@ -38,7 +38,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         print(f"DEBUG: User {form_data.username} not found in DB")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="User not found. Database was reset. Please Register again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     

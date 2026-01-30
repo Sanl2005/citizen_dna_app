@@ -31,13 +31,29 @@ class CitizenProfile(Base):
     occupation = Column(String(100))
     location_state = Column(String(100))
     location_district = Column(String(100))
-    location_type = Column(String(50), default="Urban") # Urban, Rural, Semi-Urban
+    location_type = Column(String(50), default="Urban") # Deprecated, use area_of_residence
+    area_of_residence = Column(String(50), default="Urban")
+    
     community = Column(String(100), nullable=True) # SC, ST, OBC, General
     # Disability status, family size, etc.
     disability_status = Column(Boolean, default=False)
     family_size = Column(Integer, default=1)
     
+    # New Fields
+    employment_status = Column(String(100), default="Unemployed")
+    is_student = Column(String(50), default="No")
+    single_parent_child = Column(String(50), default="No")
+    
+    # Documents (Filenames only for now)
+    marriage_cert = Column(String(255), nullable=True)
+    divorce_cert = Column(String(255), nullable=True)
+    widow_cert = Column(String(255), nullable=True)
+    community_cert = Column(String(255), nullable=True)
+    aadhar_card = Column(String(255), nullable=True)
+    income_cert = Column(String(255), nullable=True)
+
     # Calculated risk score from AI
+    minority_status = Column(String(50), default="No")
     risk_score_health = Column(Float, default=0.0)
     risk_score_financial = Column(Float, default=0.0)
     
@@ -58,6 +74,7 @@ class Scheme(Base):
     
     # For simple rule-based filtering
     min_age = Column(Integer, nullable=True)
+    max_age = Column(Integer, nullable=True)
     max_income = Column(Float, nullable=True)
     required_gender = Column(String(50), nullable=True)
     apply_url = Column(String(500), nullable=True)

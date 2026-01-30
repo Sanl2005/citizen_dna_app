@@ -47,12 +47,22 @@ class ProfileBase(BaseModel):
     income: float
     education: str
     occupation: str
+    employment_status: str
     location_state: str
     location_district: str
-    location_type: str = "Urban"
+    area_of_residence: str = "Urban"
     community: Optional[str] = None
     disability_status: bool
     family_size: int
+    single_parent_child: str = "No"
+    is_student: str = "No"
+    
+    marriage_cert: Optional[str] = None
+    divorce_cert: Optional[str] = None
+    widow_cert: Optional[str] = None
+    community_cert: Optional[str] = None
+    aadhar_card: Optional[str] = None
+    income_cert: Optional[str] = None
 
 class ProfileCreate(ProfileBase):
     pass

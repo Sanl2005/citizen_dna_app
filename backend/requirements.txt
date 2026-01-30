@@ -13,3 +13,6 @@ python-multipart
 python-dotenv
 aiosqlite
 mysql-connector-python
+groq
+google-generativeai
+xgboost

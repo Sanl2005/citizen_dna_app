@@ -38,15 +38,23 @@ def create_or_update_profile(
         "disability_status": db_profile.disability_status,
         "education": db_profile.education,
         "occupation": db_profile.occupation,
-        "location": db_profile.location_state,
-        "location_type": db_profile.location_type,
+        "employment_status": db_profile.employment_status,
+        "is_student": db_profile.is_student, # Now explicit
+        "location_state": db_profile.location_state,
+        "area_of_residence": db_profile.area_of_residence, # Renamed from location_type
         "community": db_profile.community,
         "gender": db_profile.gender
     }
     
-    score = ai_engine.predict_risk(ai_input)
-    db_profile.risk_score_health = score
-    db_profile.risk_score_financial = score # Simplification for demo, could train 2 models
+    # Calculate Component Risks explicitly for better UI accuracy
+    h_score = ai_engine.calculate_health_risk(ai_input)
+    f_score = ai_engine.calculate_financial_risk(ai_input)
+    
+    db_profile.risk_score_health = h_score
+    db_profile.risk_score_financial = f_score
+    
+    # Use average for scheme boosting logic
+    score = (h_score + f_score) / 2
 
     
     # Generate Real-time Recommendations
@@ -56,45 +64,140 @@ def create_or_update_profile(
     # 2. Match with available schemes
     all_schemes = db.query(models.Scheme).all()
     for s in all_schemes:
+        # --- Strict Exclusion Criteria (Hard Filters) ---
+        
+        # 1. Gender Filter (Enhanced)
+        user_g = (db_profile.gender or "").lower()
+        req_g = (s.required_gender or "").lower()
+        
+        # Check explicit requirements
+        if user_g == "male":
+            if req_g in ["female", "woman", "women"]:
+                continue
+            # Additional check: If Scheme Category or Name suggests it's for women
+            # (e.g. "Mahila Samman", "Maternity Benefit", Category="Women Empowerment")
+            check_text = ((s.category or "") + " " + (s.scheme_name or "")).lower()
+            if any(w in check_text for w in ["women", "woman", "female", "girl", "daughter", "maternity", "widow", "mahila", "nari", "sister", "mother"]):
+                continue
+
+        if user_g == "female":
+            if req_g in ["male", "man", "men"]:
+                continue
+
+        # 2. Age Filter (Strict)
+        if s.min_age and db_profile.age < s.min_age:
+            continue
+        
+        if s.max_age and db_profile.age > s.max_age:
+            continue
+            
+        # 3. Income Filter (Strict)
+        if s.max_income and db_profile.income > s.max_income:
+            continue
+
+        # 4. Occupation Filter (Heuristic)
+        scheme_text = ((s.scheme_name or "") + " " + (s.description or "") + " " + (s.eligibility_rules or "")).lower()
+        
+        # Farmer Check
+        if any(x in scheme_text for x in ["kisan", "farmer", "agriculture", "krishi", "crop insurance"]):
+            user_occ = (db_profile.occupation or "").lower()
+            is_farmer = any(x in user_occ for x in ["farmer", "agriculture", "cultivator"])
+            if not is_farmer: continue
+
+        # Street Vendor Check (PM SVANidhi)
+        if "street vendor" in scheme_text or "svanidhi" in scheme_text:
+             user_occ = (db_profile.occupation or "").lower()
+             if "vendor" not in user_occ and "hawker" not in user_occ: continue
+             
+        # 5. Student / Education Filter (Strict)
+        if any(x in scheme_text for x in ["student", "scholarship", "fellowship", "matric", "university", "college"]):
+            # Must be a student
+            if (db_profile.is_student or "No") == "No": 
+                continue
+
+        # 6. Community / Social Category Filter (Strict)
+        # Define user status
+        user_comm = (db_profile.community or "General").lower()
+        is_minority = (db_profile.minority_status or "No") == "Yes"
+        
+        # Check for SC requirements
+        if "sc " in scheme_text or "scheduled caste" in scheme_text:
+            if "sc" not in user_comm: continue
+            
+        # Check for ST requirements
+        if "st " in scheme_text or "scheduled tribe" in scheme_text:
+            if "st" not in user_comm: continue
+            
+        # Check for OBC requirements
+        if "obc" in scheme_text or "backward class" in scheme_text:
+            if "obc" not in user_comm: continue
+            
+        # Check for Minority requirements
+        if "minority" in scheme_text:
+            if not is_minority: continue
+
+        # --- Matching Logic (Positive Signals) ---
         match = False
         reasons = []
         
         # Simple Logic Engine
+        # If filters pass, we check for positive indicators to confirm match
+        
+        # Age eligibility (already passed filter, but adds to reason)
         if s.min_age and db_profile.age >= s.min_age:
-            match = True
             reasons.append(f"Eligible for age {db_profile.age}")
             
+        # Income eligibility
         if s.max_income and db_profile.income <= s.max_income:
-            match = True
-            reasons.append(f"Income ₹{db_profile.income} is within limits")
+            reasons.append(f"Income ₹{db_profile.income} fits limit")
             
-        if s.required_gender and db_profile.gender == s.required_gender:
-            match = True
+        # Gender eligibility
+        if s.required_gender and (db_profile.gender or "").lower() == s.required_gender.lower():
+            match = True # Strong match
             reasons.append(f"Dedicated benefit for {db_profile.gender}")
             
-        if "Rural" in s.description and db_profile.location_type == "Rural":
+        # Location/Rural
+        if s.description and "Rural" in s.description and db_profile.location_type == "Rural":
             match = True
             reasons.append("Rural area support")
 
-        if db_profile.community and (db_profile.community in s.scheme_name or db_profile.community in s.description):
+        # Community Specific
+        if db_profile.community and (db_profile.community in (s.scheme_name or "") or db_profile.community in (s.description or "")):
             match = True
             reasons.append(f"Targeted for {db_profile.community} category")
 
-        if score > 0.6: # High risk = high priority for welfare
+        # Occupation Specific (Farmer/Vendor/Student already filtered, so here we confirm match)
+        if "student" in scheme_text and db_profile.is_student == "Yes":
             match = True
-            reasons.append("High priority welfare match")
+            reasons.append("Student benefit")
+            
+        if "agriculture" in scheme_text and "farmer" in (db_profile.occupation or "").lower():
+            match = True
+            reasons.append("Farmer benefit")
+            
+        # Score Logic - Only boost if passes basics
+        if score > 0.6: 
+             # Only auto-match high risk if it's a general welfare scheme or health scheme
+             if s.category in ["Health", "Pension", "Housing", "Rural Development"]:
+                 match = True
+                 reasons.append("High priority welfare match")
+
+        # General "All" match fallback if no specific exclusions triggered and it's a generic category
+        # E.g. Skill Development is often open to all if age fits
+        if not match and s.category in ["Skill Development", "Health", "Employment"]:
+            # If no hard blocks were hit, these are generally applicable
+            match = True
+            reasons.append(f"General eligibility for {s.category}")
 
         if match:
-            # Boost confidence for community/gender matches
+             # Boost confidence
             confidence = 0.8 + (score * 0.1)
-            if db_profile.community and db_profile.community in s.scheme_name:
-                confidence += 0.1
             
             new_rec = models.Recommendation(
                 user_id=current_user.id,
                 scheme_id=s.id,
                 confidence_score=min(confidence, 0.99),
-                reason=" and ".join(reasons[:2]) or "AI predicted match based on DNA profile"
+                reason=" and ".join(reasons[:2]) or "AI predicted match based on profile"
             )
             db.add(new_rec)
     
