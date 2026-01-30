@@ -54,3 +54,29 @@ yarn-error.log*
 
 # Project Specific
 citizen_large_dataset.csv
+
+# --- Merged from citizen_dna_app/.gitignore ---
+
+# Expo
+.expo/
+dist/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# iOS / Android (Unanchored to apply to subdirectories)
+ios/
+android/
+app-example/
+*.tsbuildinfo
+*.pem
